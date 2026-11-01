@@ -75,8 +75,9 @@ def publish(day: date, image_url: str) -> None:
     if meta.get("media_id"):
         print(f"Already posted for {day} (media {meta['media_id']}); skipping.")
         return
+    # strip(): pasted secrets often carry a stray space or newline
     media_id = instagram.publish_image(
-        os.environ["IG_USER_ID"], os.environ["IG_ACCESS_TOKEN"], image_url, meta["caption"]
+        os.environ["IG_USER_ID"].strip(), os.environ["IG_ACCESS_TOKEN"].strip(), image_url, meta["caption"]
     )
     meta["media_id"] = media_id
     meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False))
@@ -102,7 +103,7 @@ def main() -> None:
         posted = meta_path.exists() and bool(json.loads(meta_path.read_text()).get("media_id"))
         print("true" if posted else "false")
     elif args.command == "refresh-token":
-        print(instagram.refresh_token(os.environ["IG_ACCESS_TOKEN"]))
+        print(instagram.refresh_token(os.environ["IG_ACCESS_TOKEN"].strip()))
 
 
 if __name__ == "__main__":
